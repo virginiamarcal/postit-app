@@ -1,11 +1,20 @@
 # Som do lembrete
 
-Coloque aqui um arquivo chamado **`miau.mp3`** para o gatinho miar baixinho
-quando o lembrete de água aparecer.
+O gatinho pode miar baixinho quando o lembrete de água aparecer. O som não vem
+junto com o programa — cada um coloca o seu, para ninguém acabar distribuindo
+áudio de terceiros sem perceber. Sem arquivo, o lembrete funciona normalmente,
+só que calado.
 
-Sem esse arquivo o lembrete funciona normalmente, só que calado — não dá erro.
-Por isso o projeto não vem com som: assim cada um escolhe o seu, sem carregar
-áudio de terceiros junto.
+## Onde colocar o arquivo
+
+Salve um MP3 chamado **`miau.mp3`** em um destes lugares:
+
+- **Se você instalou o programa:** na pasta de dados do app —
+  cole `%APPDATA%\Post-it` na barra de endereço do Explorador de Arquivos e
+  jogue o `miau.mp3` lá dentro.
+- **Se você roda pelo código:** aqui mesmo, em `assets/sounds/miau.mp3`.
+
+Depois é só reabrir o post-it. O botão 💧 → **"Ver como fica"** testa na hora.
 
 ## Onde achar
 

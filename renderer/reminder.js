@@ -4,11 +4,11 @@ const recadoEl = document.getElementById('recado');
 // Clicar dispensa o lembrete antes da hora.
 postitEl.addEventListener('click', () => window.api.fecharLembrete());
 
-// Miau baixinho. Se o arquivo de som não existir, o lembrete simplesmente
-// aparece calado — nunca quebra nem reclama.
-function miar() {
+// Miau baixinho. O caminho vem pronto do processo principal, que já procurou o
+// arquivo; se não houver som, o lembrete aparece calado — nunca quebra.
+function miar(url) {
   try {
-    const som = new Audio('../assets/sounds/miau.mp3');
+    const som = new Audio(url);
     som.volume = 0.35;
     som.play().catch(() => {});
   } catch {
@@ -19,7 +19,7 @@ function miar() {
 window.api.onLembrete(({ skin, texto, som }) => {
   applySkin(postitEl, skin, { width: postitEl.clientWidth, pad: 8 });
   recadoEl.textContent = texto;
-  if (som) miar();
+  if (som) miar(som);
 
   // dois quadros antes de animar, para o estado inicial valer
   postitEl.classList.remove('saindo');

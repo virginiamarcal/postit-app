@@ -368,7 +368,7 @@ function mostrarLembrete(texto) {
     reminderWin.webContents.send('lembrete', {
       skin: currentSkin(),
       texto,
-      som: aguaConfig().som !== false,
+      som: aguaConfig().som !== false ? caminhoDoMiau() : null,
     });
     clearTimeout(saidaTimer);
     saidaTimer = setTimeout(esconderLembrete, LEMBRETE_SEG * 1000);
@@ -379,6 +379,18 @@ function mostrarLembrete(texto) {
   } else {
     enviar();
   }
+}
+
+// O som não vem junto com o programa (seria redistribuir áudio de terceiros).
+// Cada pessoa coloca o seu: primeiro na pasta de dados do app, depois na pasta
+// do projeto para quem roda pelo código.
+function caminhoDoMiau() {
+  const candidatos = [
+    path.join(app.getPath('userData'), 'miau.mp3'),
+    path.join(__dirname, 'assets', 'sounds', 'miau.mp3'),
+  ];
+  const achado = candidatos.find((p) => fs.existsSync(p));
+  return achado ? `file:///${achado.replace(/\\/g, '/')}` : null;
 }
 
 function tocarLembreteAgua() {
