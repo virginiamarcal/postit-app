@@ -1,10 +1,17 @@
-const { app, BrowserWindow, Tray, Menu, ipcMain, screen, Notification, nativeImage } = require('electron');
+const { app, BrowserWindow, Tray, Menu, ipcMain, screen, Notification, nativeImage, shell, dialog } = require('electron');
 const path = require('path');
 const fs = require('fs');
 const { Store } = require('./store');
 
 app.setName('Post-it');
 if (process.platform === 'win32') app.setAppUserModelId('com.virginia.postit');
+
+// Assinatura: a patinha no rodapé da nota e o "Sobre" na bandeja levam aqui.
+const AUTOR = {
+  nome: 'Virginia Lara Marçal',
+  instagram: 'https://instagram.com/virginiamarcal',
+  github: 'https://github.com/virginiamarcal/postit-app',
+};
 
 const ASSETS = path.join(__dirname, 'assets');
 let tray = null;
@@ -316,8 +323,27 @@ function buildContextMenu() {
       click: (item) => setAutoStart(item.checked),
     },
     { type: 'separator' },
+    { label: 'Sobre', click: () => showAbout() },
     { label: 'Sair', click: () => { app.isQuiting = true; app.quit(); } },
   ]);
+}
+
+function showAbout() {
+  dialog.showMessageBox({
+    type: 'none',
+    icon: nativeImage.createFromPath(
+      path.join(SKINS_DIR, currentSkin() ? currentSkin().id : '', 'app.png')
+    ),
+    title: 'Sobre o Post-it',
+    message: 'Post-it',
+    detail: `Lembretes que piscam na barra de tarefas.\n\nFeito por ${AUTOR.nome}.`,
+    buttons: ['Instagram', 'Código no GitHub', 'Fechar'],
+    defaultId: 2,
+    cancelId: 2,
+  }).then(({ response }) => {
+    if (response === 0) shell.openExternal(AUTOR.instagram);
+    if (response === 1) shell.openExternal(AUTOR.github);
+  });
 }
 
 app.whenReady().then(() => {
@@ -385,6 +411,7 @@ ipcMain.handle('tasks:updatePos', (_e, { id, x, y }) => {
   store.updateTask(id, { x, y });
   return true;
 });
+ipcMain.handle('autor:instagram', () => shell.openExternal(AUTOR.instagram));
 ipcMain.handle('skins:list', () => ({ skins, currentId: currentSkin()?.id || null }));
 ipcMain.handle('skins:current', () => currentSkin());
 ipcMain.handle('skins:set', (_e, id) => {

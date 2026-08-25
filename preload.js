@@ -7,6 +7,7 @@ contextBridge.exposeInMainWorld('api', {
   toggleDone: (id) => ipcRenderer.invoke('tasks:toggleDone', id),
   deleteTask: (id) => ipcRenderer.invoke('tasks:delete', id),
   updatePos: (id, x, y) => ipcRenderer.invoke('tasks:updatePos', { id, x, y }),
+  abrirInstagram: () => ipcRenderer.invoke('autor:instagram'),
   listSkins: () => ipcRenderer.invoke('skins:list'),
   getSkin: () => ipcRenderer.invoke('skins:current'),
   setSkin: (id) => ipcRenderer.invoke('skins:set', id),

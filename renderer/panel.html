@@ -97,6 +97,35 @@
   .skinOpt:hover { border-color: rgba(230,168,23,0.5); }
   .skinOpt.sel { border-color: #e6a817; background: rgba(230,168,23,0.14); }
 
+  /* Assinatura discreta: fica no rodapé do papel, do lado esquerdo — longe da
+     dobrinha do canto. Quase invisível parada; o convite só aparece no hover. */
+  .pawMark {
+    position: absolute;
+    left: var(--paper-left, 45px);
+    bottom: calc(var(--paper-bottom, 72px) * 0.28);
+    -webkit-app-region: no-drag;
+    background: none;
+    padding: 2px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    opacity: 0.5;
+    transition: opacity .18s ease;
+    z-index: 6;
+  }
+  .pawMark:hover { opacity: 1; }
+  .pawMark svg { width: 17px; height: 17px; display: block; }
+  .pawMark svg path, .pawMark svg ellipse { fill: #6b5a25; }
+  .pawMark .hint {
+    font-size: 10px;
+    color: #6b5a25;
+    white-space: nowrap;
+    max-width: 0;
+    overflow: hidden;
+    transition: max-width .22s ease;
+  }
+  .pawMark:hover .hint { max-width: 150px; }
+
   .content {
     position: absolute;
     left: var(--paper-left, 45px);
@@ -238,6 +267,17 @@
         </div>
       </div>
     </div>
+
+    <button class="pawMark" id="pawMark" title="Feito por Virginia Lara Marçal — abrir o Instagram">
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <ellipse cx="12" cy="16.5" rx="6" ry="5"/>
+        <ellipse cx="5.6" cy="9.6" rx="2.3" ry="3"/>
+        <ellipse cx="9.8" cy="6.4" rx="2.3" ry="3.2"/>
+        <ellipse cx="14.2" cy="6.4" rx="2.3" ry="3.2"/>
+        <ellipse cx="18.4" cy="9.6" rx="2.3" ry="3"/>
+      </svg>
+      <span class="hint">feito por @virginiamarcal</span>
+    </button>
   </div>
   <script src="skin.js"></script>
   <script src="panel.js"></script>

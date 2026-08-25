@@ -115,3 +115,19 @@ dobrinha) — para a nota crescer conforme a lista sem distorcer o desenho. O
 manifesto guarda as medidas em pixels da arte original, e a interface converte
 para proporção na hora de desenhar; é isso que faz qualquer arte funcionar sem
 ajuste manual.
+
+A janela também se dimensiona por papel, para o papel sair sempre com a mesma
+largura útil — artes diferentes vêm com o papel mais largo ou mais estreito
+dentro do PNG, e uma janela de tamanho fixo deixaria vão transparente sobrando
+nas mais estreitas.
+
+## Licença
+
+MIT — veja [LICENSE](LICENSE). Use, modifique e distribua à vontade.
+
+As artes dos gatos foram geradas por IA e acompanham o projeto sob a mesma
+licença.
+
+---
+
+Feito por [@virginiamarcal](https://instagram.com/virginiamarcal) 🐾

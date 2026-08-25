@@ -128,6 +128,7 @@ pinBtn.addEventListener('click', async () => {
 });
 window.api.onPinChanged(paintPin);
 
+document.getElementById('pawMark').addEventListener('click', () => window.api.abrirInstagram());
 document.getElementById('closeBtn').addEventListener('click', () => window.api.hidePanel());
 document.getElementById('boardBtn').addEventListener('click', () => window.api.openBoard());
 
