@@ -1,8 +1,24 @@
 {
     "skins":  [
                   {
+                      "id":  "cinza-azul",
+                      "name":  "Cinzento",
+                      "width":  1254,
+                      "height":  1254,
+                      "headH":  588,
+                      "midH":  60,
+                      "footH":  224,
+                      "curl":  183,
+                      "paper":  {
+                                    "left":  169,
+                                    "right":  1083,
+                                    "top":  340,
+                                    "bottom":  1224
+                                }
+                  },
+                  {
                       "id":  "gatinho-laranja",
-                      "name":  "Gatinho laranja",
+                      "name":  "Laranjinha",
                       "width":  1240,
                       "height":  1268,
                       "headH":  619,
@@ -14,6 +30,102 @@
                                     "right":  1099,
                                     "top":  390,
                                     "bottom":  1209
+                                }
+                  },
+                  {
+                      "id":  "preto-pessego",
+                      "name":  "Pretinho",
+                      "width":  1254,
+                      "height":  1254,
+                      "headH":  579,
+                      "midH":  60,
+                      "footH":  308,
+                      "curl":  184,
+                      "paper":  {
+                                    "left":  167,
+                                    "right":  1085,
+                                    "top":  373,
+                                    "bottom":  1107
+                                }
+                  },
+                  {
+                      "id":  "siames-lilas",
+                      "name":  "Siamês",
+                      "width":  1254,
+                      "height":  1254,
+                      "headH":  618,
+                      "midH":  60,
+                      "footH":  282,
+                      "curl":  173,
+                      "paper":  {
+                                    "left":  195,
+                                    "right":  1059,
+                                    "top":  419,
+                                    "bottom":  1128
+                                }
+                  },
+                  {
+                      "id":  "smoking-amarelo",
+                      "name":  "Smoking",
+                      "width":  1254,
+                      "height":  1254,
+                      "headH":  625,
+                      "midH":  60,
+                      "footH":  223,
+                      "curl":  177,
+                      "paper":  {
+                                    "left":  186,
+                                    "right":  1069,
+                                    "top":  397,
+                                    "bottom":  1210
+                                }
+                  },
+                  {
+                      "id":  "tigrado-amarelo",
+                      "name":  "Tigrado",
+                      "width":  1254,
+                      "height":  1254,
+                      "headH":  623,
+                      "midH":  60,
+                      "footH":  223,
+                      "curl":  178,
+                      "paper":  {
+                                    "left":  182,
+                                    "right":  1071,
+                                    "top":  395,
+                                    "bottom":  1211
+                                }
+                  },
+                  {
+                      "id":  "tigrado-creme",
+                      "name":  "Tigrado real",
+                      "width":  1254,
+                      "height":  1254,
+                      "headH":  701,
+                      "midH":  60,
+                      "footH":  232,
+                      "curl":  155,
+                      "paper":  {
+                                    "left":  241,
+                                    "right":  1017,
+                                    "top":  521,
+                                    "bottom":  1163
+                                }
+                  },
+                  {
+                      "id":  "tricolor-rosa",
+                      "name":  "Tricolor",
+                      "width":  1254,
+                      "height":  1254,
+                      "headH":  605,
+                      "midH":  60,
+                      "footH":  216,
+                      "curl":  176,
+                      "paper":  {
+                                    "left":  186,
+                                    "right":  1068,
+                                    "top":  362,
+                                    "bottom":  1229
                                 }
                   }
               ]

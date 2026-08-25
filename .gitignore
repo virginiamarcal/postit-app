@@ -13,3 +13,6 @@ npm-debug.log*
 Thumbs.db
 desktop.ini
 .DS_Store
+
+# backups do fix-transparency.ps1
+assets/skins-src/*.original.png

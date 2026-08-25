@@ -103,15 +103,30 @@ function Save-Thumb($bmp, $paper, $path, $size, $alertBadge) {
   $canvas.Dispose(); $crop.Dispose()
 }
 
-# "gatinho-laranja" -> "Gatinho laranja"
+# Nome de exibicao. O nome do arquivo nao pode ter acento (vira identificador),
+# entao names.json permite dar um nome bonito em portugues para cada papel.
+$niceNames = @{}
+$namesFile = Join-Path $srcDir "names.json"
+if (Test-Path $namesFile) {
+  $raw = [System.IO.File]::ReadAllText($namesFile, [System.Text.Encoding]::UTF8)
+  ($raw | ConvertFrom-Json).PSObject.Properties | ForEach-Object {
+    $niceNames[$_.Name] = $_.Value
+  }
+}
+
+# "gatinho-laranja" -> "Gatinho laranja" (quando nao ha nome em names.json)
 function Prettify($slug) {
+  if ($niceNames.ContainsKey($slug)) { return $niceNames[$slug] }
   $s = ($slug -replace '[-_]+', ' ').Trim()
   if ($s.Length -eq 0) { return $slug }
   return $s.Substring(0,1).ToUpper() + $s.Substring(1)
 }
 
 $skins = @()
-$files = Get-ChildItem -Path $srcDir -Filter *.png | Sort-Object Name
+# Ignora os backups deixados por fix-transparency.ps1 (arte.original.png).
+$files = Get-ChildItem -Path $srcDir -Filter *.png |
+         Where-Object { $_.Name -notlike "*.original.png" } |
+         Sort-Object Name
 
 if ($files.Count -eq 0) { throw "Nenhum PNG em $srcDir" }
 

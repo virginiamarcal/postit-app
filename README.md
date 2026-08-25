@@ -45,9 +45,28 @@ O script **encontra sozinho** onde fica o papel dentro da arte e recorta as trê
 fatias (topo com o bichinho, meio esticável, base com a dobrinha), mais as
 miniaturas e os ícones. Não é preciso medir nada na mão.
 
+O nome que aparece no menu sai de `assets/skins-src/names.json` (o nome do arquivo
+vira identificador e não pode ter acento; o `names.json` é onde mora o nome
+bonito). Sem entrada lá, o script usa o próprio nome do arquivo.
+
 **A arte precisa ser:** um PNG **com fundo transparente**, com o bichinho em cima
 e o papel embaixo ocupando quase toda a largura — é assim que o script separa um
 do outro.
+
+### Se a arte vier com o xadrez pintado
+
+Geradores de imagem às vezes exportam o quadriculado cinza como pixel de verdade,
+em vez de transparência — na tela parece igual, mas o recorte não funciona. O
+sintoma é o `build-skins.ps1` reportar o papel ocupando a imagem inteira
+(`papel x 0..<largura>`). Conserto:
+
+```powershell
+powershell -File scripts/fix-transparency.ps1 -Path assets/skins-src/arte.png
+```
+
+O fundo é apagado por preenchimento a partir das bordas, então só sai o que está
+ligado ao contorno — patinhas e pelos brancos no meio do desenho ficam intactos.
+O original é guardado ao lado como `arte.original.png`.
 
 Se numa arte a dobrinha do canto ficar por baixo dos botões, ajuste `curl` (em
 pixels da arte original) no papel correspondente dentro de
