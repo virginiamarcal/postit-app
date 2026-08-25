@@ -33,6 +33,22 @@
                                 }
                   },
                   {
+                      "id":  "magali",
+                      "name":  "Magali",
+                      "width":  1254,
+                      "height":  1254,
+                      "headH":  674,
+                      "midH":  60,
+                      "footH":  277,
+                      "curl":  155,
+                      "paper":  {
+                                    "left":  241,
+                                    "right":  1016,
+                                    "top":  504,
+                                    "bottom":  1111
+                                }
+                  },
+                  {
                       "id":  "preto-pessego",
                       "name":  "Pretinho",
                       "width":  1254,
