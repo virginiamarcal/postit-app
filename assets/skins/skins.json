@@ -1,0 +1,20 @@
+{
+    "skins":  [
+                  {
+                      "id":  "gatinho-laranja",
+                      "name":  "Gatinho laranja",
+                      "width":  1240,
+                      "height":  1268,
+                      "headH":  619,
+                      "midH":  60,
+                      "footH":  239,
+                      "curl":  193,
+                      "paper":  {
+                                    "left":  132,
+                                    "right":  1099,
+                                    "top":  390,
+                                    "bottom":  1209
+                                }
+                  }
+              ]
+}

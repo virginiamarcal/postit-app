@@ -8,11 +8,49 @@ const taskTime = document.getElementById('taskTime');
 const WEEKDAYS = ['domingo', 'segunda-feira', 'terça-feira', 'quarta-feira', 'quinta-feira', 'sexta-feira', 'sábado'];
 const MONTHS = ['jan', 'fev', 'mar', 'abr', 'mai', 'jun', 'jul', 'ago', 'set', 'out', 'nov', 'dez'];
 
+const postitEl = document.querySelector('.postit');
+const skinBtn = document.getElementById('skinBtn');
+const skinPicker = document.getElementById('skinPicker');
+const skinGrid = document.getElementById('skinGrid');
+
+function paintSkin(skin) {
+  applySkin(postitEl, skin, { width: 420 });
+}
+
+async function buildSkinPicker() {
+  const { skins, currentId } = await window.api.listSkins();
+  skinGrid.innerHTML = '';
+  // Com um papel só não há o que escolher — some com o botão.
+  skinBtn.style.display = skins.length > 1 ? 'flex' : 'none';
+  for (const s of skins) {
+    const btn = document.createElement('button');
+    btn.className = 'skinOpt' + (s.id === currentId ? ' sel' : '');
+    btn.title = s.name;
+    btn.innerHTML = `<img src="../assets/skins/${s.id}/thumb.png" alt="${s.name}">`;
+    btn.addEventListener('click', async () => {
+      paintSkin(await window.api.setSkin(s.id));
+      skinPicker.classList.remove('open');
+      buildSkinPicker();
+    });
+    skinGrid.appendChild(btn);
+  }
+}
+
+skinBtn.addEventListener('click', () => skinPicker.classList.toggle('open'));
+document.addEventListener('click', (e) => {
+  if (!skinPicker.contains(e.target) && e.target !== skinBtn) {
+    skinPicker.classList.remove('open');
+  }
+});
+window.api.onSkinChanged((skin) => { paintSkin(skin); buildSkinPicker(); });
+
 async function init() {
   const today = await window.api.getTodayStr();
   taskDate.value = today;
   const d = new Date();
   dateLabel.textContent = `${WEEKDAYS[d.getDay()]}, ${d.getDate()} de ${MONTHS[d.getMonth()]}`;
+  paintSkin(await window.api.getSkin());
+  await buildSkinPicker();
   paintPin(await window.api.getPinned());
   await render();
 }

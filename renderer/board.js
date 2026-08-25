@@ -2,6 +2,9 @@ const boardEl = document.getElementById('board');
 
 const MONTHS = ['jan', 'fev', 'mar', 'abr', 'mai', 'jun', 'jul', 'ago', 'set', 'out', 'nov', 'dez'];
 
+const NOTE_W = 190;
+let skin = null;
+
 function formatDate(dateStr) {
   const [y, m, d] = dateStr.split('-').map(Number);
   return `${d} ${MONTHS[m - 1]}`;
@@ -56,6 +59,7 @@ async function render() {
       await window.api.deleteTask(t.id);
       render();
     });
+    applySkin(note, skin, { width: NOTE_W, pad: 5 });
     makeDraggable(note, t.id);
     boardEl.appendChild(note);
   });
@@ -97,4 +101,15 @@ function makeDraggable(el, id) {
 
 document.getElementById('closeBtn').addEventListener('click', () => window.api.closeBoard());
 window.api.onTasksChanged(() => render());
-render();
+window.api.onSkinChanged((s) => { skin = s; render(); });
+
+(async () => {
+  skin = await window.api.getSkin();
+  // a nota acompanha a altura mínima da arte, para o bichinho não ficar espremido
+  if (skin) {
+    document.documentElement.style.setProperty(
+      '--note-h', `${minSkinHeight(skin, NOTE_W, 96)}px`
+    );
+  }
+  render();
+})();

@@ -1,5 +1,6 @@
 const { app, BrowserWindow, Tray, Menu, ipcMain, screen, Notification, nativeImage } = require('electron');
 const path = require('path');
+const fs = require('fs');
 const { Store } = require('./store');
 
 app.setName('Post-it');
@@ -13,8 +14,34 @@ let store = null;
 let blinkTimer = null;
 let blinkState = false;
 
-const iconNormal = () => nativeImage.createFromPath(path.join(ASSETS, 'tray-normal.png'));
-const iconAlert = () => nativeImage.createFromPath(path.join(ASSETS, 'tray-alert.png'));
+// ---- peles (papéis do post-it) ----
+const SKINS_DIR = path.join(ASSETS, 'skins');
+let skins = [];
+
+function loadSkins() {
+  try {
+    const raw = fs.readFileSync(path.join(SKINS_DIR, 'skins.json'), 'utf-8');
+    skins = JSON.parse(raw).skins || [];
+  } catch (err) {
+    console.error('Não consegui ler assets/skins/skins.json:', err.message);
+    skins = [];
+  }
+}
+
+function currentSkin() {
+  if (!skins.length) return null;
+  const id = store.getSetting('skinId', null);
+  return skins.find((s) => s.id === id) || skins[0];
+}
+
+const skinIcon = (file) => {
+  const skin = currentSkin();
+  if (!skin) return nativeImage.createEmpty();
+  return nativeImage.createFromPath(path.join(SKINS_DIR, skin.id, file));
+};
+
+const iconNormal = () => skinIcon('tray.png');
+const iconAlert = () => skinIcon('tray-alert.png');
 
 function todayStr() {
   const d = new Date();
@@ -82,6 +109,19 @@ function setPinned(value) {
   applyPinState();
 }
 
+function setSkin(id) {
+  if (!skins.some((s) => s.id === id)) return;
+  store.setSetting('skinId', id);
+  if (tray) {
+    tray.setImage(store.hasPendingToday(todayStr()) ? iconAlert() : iconNormal());
+    tray.setContextMenu(buildContextMenu());
+  }
+  for (const w of [panelWin, boardWin]) {
+    if (w && !w.isDestroyed()) w.webContents.send('skin-changed', currentSkin());
+  }
+  updateAlertState();
+}
+
 function broadcastChange() {
   updateAlertState();
   for (const w of [panelWin, boardWin]) {
@@ -103,7 +143,7 @@ function createPanel() {
     skipTaskbar: false,
     alwaysOnTop: true,
     title: 'Post-it',
-    icon: path.join(ASSETS, 'app-cat.png'),
+    icon: path.join(SKINS_DIR, currentSkin() ? currentSkin().id : '', 'app.png'),
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
       contextIsolation: true,
@@ -202,7 +242,7 @@ function createBoard() {
     frame: false,
     show: false,
     title: 'Post-it — agendamentos',
-    icon: path.join(ASSETS, 'app-cat.png'),
+    icon: path.join(SKINS_DIR, currentSkin() ? currentSkin().id : '', 'app.png'),
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
       contextIsolation: true,
@@ -249,6 +289,15 @@ function buildContextMenu() {
       click: (item) => setPinned(item.checked),
     },
     {
+      label: 'Trocar o papel',
+      submenu: skins.map((s) => ({
+        label: s.name,
+        type: 'radio',
+        checked: currentSkin() ? currentSkin().id === s.id : false,
+        click: () => setSkin(s.id),
+      })),
+    },
+    {
       label: 'Iniciar com o Windows',
       type: 'checkbox',
       checked: autoStart,
@@ -261,6 +310,7 @@ function buildContextMenu() {
 
 app.whenReady().then(() => {
   store = new Store(app.getPath('userData'));
+  loadSkins();
 
   if (store.getSetting('autoStart', null) === null) {
     setAutoStart(true);
@@ -322,6 +372,12 @@ ipcMain.handle('tasks:delete', (_e, id) => {
 ipcMain.handle('tasks:updatePos', (_e, { id, x, y }) => {
   store.updateTask(id, { x, y });
   return true;
+});
+ipcMain.handle('skins:list', () => ({ skins, currentId: currentSkin()?.id || null }));
+ipcMain.handle('skins:current', () => currentSkin());
+ipcMain.handle('skins:set', (_e, id) => {
+  setSkin(id);
+  return currentSkin();
 });
 ipcMain.handle('pin:get', () => isPinned());
 ipcMain.handle('pin:toggle', () => {

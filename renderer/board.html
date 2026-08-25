@@ -41,12 +41,12 @@
     font-size: 14px;
     text-align: center;
   }
-  /* mesmas fatias do painel: head 620px, mid 60px, foot 258px de uma arte 1240px de largura */
+  /* Medidas vindas do papel escolhido (renderer/skin.js), como no painel. */
   .note {
     position: absolute;
     width: 190px;
-    height: 250px;
-    padding: 63px 22px 42px 21px;
+    height: var(--note-h, 250px);
+    padding: var(--paper-top, 63px) var(--paper-right, 22px) var(--paper-bottom, 42px) var(--paper-left, 21px);
     filter: drop-shadow(2px 6px 8px rgba(0,0,0,0.3));
     cursor: grab;
     display: flex;
@@ -62,9 +62,9 @@
     background-size: 100% 100%;
     z-index: -1;
   }
-  .note .slice-head { top: 0; height: 95px; background-image: url('../assets/cat-head.png'); }
-  .note .slice-mid  { top: 95px; bottom: 40px; background-image: url('../assets/cat-mid.png'); }
-  .note .slice-foot { bottom: 0; height: 40px; background-image: url('../assets/cat-foot.png'); }
+  .note .slice-head { top: 0; height: var(--head-h, 95px); background-image: var(--head-img); }
+  .note .slice-mid  { top: var(--head-h, 95px); bottom: var(--foot-h, 40px); background-image: var(--mid-img); }
+  .note .slice-foot { bottom: 0; height: var(--foot-h, 40px); background-image: var(--foot-img); }
   .note:active { cursor: grabbing; }
   .note.done { opacity: 0.55; }
   .note .meta {
@@ -103,6 +103,7 @@
     </div>
     <div class="board" id="board"></div>
   </div>
+  <script src="skin.js"></script>
   <script src="board.js"></script>
 </body>
 </html>

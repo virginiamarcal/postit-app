@@ -21,19 +21,21 @@
     height: 600px;
     filter: drop-shadow(3px 8px 14px rgba(0,0,0,0.35));
   }
+  /* As medidas vêm do papel escolhido (renderer/skin.js). */
   .bg { position: absolute; left: 0; width: 100%; background-repeat: no-repeat; background-size: 100% 100%; }
-  .bg-head { top: 0; height: 210px; background-image: url('../assets/cat-head.png'); }
-  .bg-mid  { top: 210px; bottom: 87px; background-image: url('../assets/cat-mid.png'); }
-  .bg-foot { bottom: 0; height: 87px; background-image: url('../assets/cat-foot.png'); }
+  .bg-head { top: 0; height: var(--head-h, 210px); background-image: var(--head-img); }
+  .bg-mid  { top: var(--head-h, 210px); bottom: var(--foot-h, 87px); background-image: var(--mid-img); }
+  .bg-foot { bottom: 0; height: var(--foot-h, 87px); background-image: var(--foot-img); }
 
   .drag-strip {
     position: absolute;
-    top: 0; left: 0; right: 0; height: 132px;
+    top: 0; left: 0; right: 0;
+    height: var(--paper-top, 132px);
     -webkit-app-region: drag;
   }
-  .closeBtn, .pinBtn {
+  .topBtn {
     position: absolute;
-    top: 138px;
+    top: var(--paper-top, 138px);
     -webkit-app-region: no-drag;
     background: rgba(120,95,30,0.14);
     color: #6b5a25;
@@ -41,23 +43,63 @@
     border-radius: 50%;
     font-size: 11px;
     line-height: 1;
-    z-index: 5;
+    z-index: 6;
     display: flex;
     align-items: center;
     justify-content: center;
   }
   .closeBtn { right: 56px; }
   .pinBtn   { right: 80px; }
-  .closeBtn:hover, .pinBtn:hover { background: rgba(120,95,30,0.28); }
+  .skinBtn  { right: 104px; }
+  .topBtn:hover { background: rgba(120,95,30,0.28); }
   .pinBtn.on { background: #e6a817; color: #fff; }
   .pinBtn.on:hover { background: #d19a12; }
 
+  /* Seletor de papel */
+  .skinPicker {
+    position: absolute;
+    top: calc(var(--paper-top, 138px) + 26px);
+    left: var(--paper-left, 45px);
+    right: var(--paper-right, 48px);
+    z-index: 7;
+    background: rgba(255,255,255,0.94);
+    border: 1px solid rgba(140,115,45,0.3);
+    border-radius: 10px;
+    padding: 8px;
+    box-shadow: 0 6px 16px rgba(0,0,0,0.18);
+    display: none;
+  }
+  .skinPicker.open { display: block; }
+  .skinPicker .label {
+    font-size: 10.5px;
+    color: #8a7238;
+    margin-bottom: 6px;
+    font-weight: 700;
+  }
+  .skinGrid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 6px;
+    max-height: 168px;
+    overflow-y: auto;
+  }
+  .skinOpt {
+    background: none;
+    padding: 2px;
+    border-radius: 8px;
+    border: 2px solid transparent;
+    line-height: 0;
+  }
+  .skinOpt img { width: 100%; border-radius: 6px; display: block; }
+  .skinOpt:hover { border-color: rgba(230,168,23,0.5); }
+  .skinOpt.sel { border-color: #e6a817; background: rgba(230,168,23,0.14); }
+
   .content {
     position: absolute;
-    left: 45px;
-    right: 48px;
-    top: 138px;
-    bottom: 72px;
+    left: var(--paper-left, 45px);
+    right: var(--paper-right, 48px);
+    top: var(--paper-top, 138px);
+    bottom: var(--paper-bottom, 72px);
     display: flex;
     flex-direction: column;
   }
@@ -165,8 +207,14 @@
     <div class="bg bg-mid"></div>
     <div class="bg bg-foot"></div>
     <div class="drag-strip"></div>
-    <button class="pinBtn" id="pinBtn" title="Fixar na tela">📌</button>
-    <button class="closeBtn" id="closeBtn">✕</button>
+    <button class="topBtn skinBtn" id="skinBtn" title="Trocar o papel">🐾</button>
+    <button class="topBtn pinBtn" id="pinBtn" title="Fixar na tela">📌</button>
+    <button class="topBtn closeBtn" id="closeBtn">✕</button>
+
+    <div class="skinPicker" id="skinPicker">
+      <div class="label">Escolha o papel</div>
+      <div class="skinGrid" id="skinGrid"></div>
+    </div>
 
     <div class="content">
       <div class="head-line">
@@ -188,6 +236,7 @@
       </div>
     </div>
   </div>
+  <script src="skin.js"></script>
   <script src="panel.js"></script>
 </body>
 </html>
