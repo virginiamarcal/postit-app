@@ -1,0 +1,15 @@
+node_modules/
+dist/
+out/
+build/
+
+# dados locais / segredos
+.env
+.env.*
+*.log
+npm-debug.log*
+
+# sistema
+Thumbs.db
+desktop.ini
+.DS_Store

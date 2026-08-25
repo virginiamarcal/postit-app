@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<title>Post-it — Hoje</title>
+<link rel="stylesheet" href="shared.css" />
+<style>
+  /* Fatias medidas na imagem original (1240x1268):
+     papel  -> x 132..1099 | y 390..1210
+     head   -> y 0..620  | mid -> y 700..760 | foot -> y 1010..1268
+     escala = 420 / 1240 = 0.3387 */
+  html, body {
+    width: 420px;
+    height: 600px;
+    overflow: hidden;
+    background: transparent;
+  }
+  .postit {
+    position: relative;
+    width: 420px;
+    height: 600px;
+    filter: drop-shadow(3px 8px 14px rgba(0,0,0,0.35));
+  }
+  .bg { position: absolute; left: 0; width: 100%; background-repeat: no-repeat; background-size: 100% 100%; }
+  .bg-head { top: 0; height: 210px; background-image: url('../assets/cat-head.png'); }
+  .bg-mid  { top: 210px; bottom: 87px; background-image: url('../assets/cat-mid.png'); }
+  .bg-foot { bottom: 0; height: 87px; background-image: url('../assets/cat-foot.png'); }
+
+  .drag-strip {
+    position: absolute;
+    top: 0; left: 0; right: 0; height: 132px;
+    -webkit-app-region: drag;
+  }
+  .closeBtn, .pinBtn {
+    position: absolute;
+    top: 138px;
+    -webkit-app-region: no-drag;
+    background: rgba(120,95,30,0.14);
+    color: #6b5a25;
+    width: 20px; height: 20px;
+    border-radius: 50%;
+    font-size: 11px;
+    line-height: 1;
+    z-index: 5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .closeBtn { right: 56px; }
+  .pinBtn   { right: 80px; }
+  .closeBtn:hover, .pinBtn:hover { background: rgba(120,95,30,0.28); }
+  .pinBtn.on { background: #e6a817; color: #fff; }
+  .pinBtn.on:hover { background: #d19a12; }
+
+  .content {
+    position: absolute;
+    left: 45px;
+    right: 48px;
+    top: 138px;
+    bottom: 72px;
+    display: flex;
+    flex-direction: column;
+  }
+  .head-line {
+    padding: 2px 4px 8px;
+    border-bottom: 1px solid rgba(140,115,45,0.22);
+    margin-bottom: 6px;
+  }
+  .head-line h1 { font-size: 15px; margin: 0; font-weight: 800; color: #5c4a1e; letter-spacing: .2px; }
+  .head-line .date { font-size: 10.5px; color: #8a7238; margin-top: 1px; }
+
+  .list {
+    flex: 1;
+    overflow-y: auto;
+    padding-right: 4px;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }
+  .empty { text-align: center; color: #a08f5c; font-size: 12.5px; margin-top: 20px; }
+
+  .task {
+    display: flex;
+    align-items: flex-start;
+    gap: 7px;
+    padding: 5px 6px;
+    border-radius: 7px;
+  }
+  .task:hover { background: rgba(255,255,255,0.42); }
+  .task.done { opacity: 0.45; }
+  .task .check {
+    width: 15px; height: 15px;
+    border-radius: 50%;
+    border: 2px solid #b3a068;
+    margin-top: 2px;
+    flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 9px;
+    color: white;
+    background: transparent;
+    cursor: pointer;
+  }
+  .task.done .check { background: #7cb342; border-color: #7cb342; }
+  .task .body { flex: 1; min-width: 0; }
+  .task .text { font-size: 12.5px; word-break: break-word; color: #4a3d16; line-height: 1.3; }
+  .task.done .text { text-decoration: line-through; }
+  .task .time { font-size: 10px; color: #97854e; margin-top: 1px; }
+  .task .del { background: none; color: #bcac7c; font-size: 12px; padding: 0 2px; opacity: 0; }
+  .task:hover .del { opacity: 1; }
+  .task .del:hover { color: #d84343; }
+
+  .composer { padding-top: 6px; border-top: 1px solid rgba(140,115,45,0.22); }
+  .composer input[type=text] {
+    width: 100%;
+    border: 1px solid rgba(140,115,45,0.3);
+    background: rgba(255,255,255,0.55);
+    border-radius: 7px;
+    padding: 5px 8px;
+    font-size: 12.5px;
+    color: #4a3d16;
+    margin-bottom: 5px;
+  }
+  .composer input[type=text]::placeholder { color: #a89a6a; }
+  .row { display: flex; gap: 5px; align-items: center; }
+  .row input[type=date], .row input[type=time] {
+    border: 1px solid rgba(140,115,45,0.3);
+    background: rgba(255,255,255,0.55);
+    border-radius: 7px;
+    padding: 3px 5px;
+    font-size: 11px;
+    color: #4a3d16;
+    flex: 1;
+    min-width: 0;
+  }
+  .toggle {
+    display: flex; align-items: center; gap: 3px;
+    font-size: 10.5px; color: #6b5a25;
+    user-select: none; white-space: nowrap;
+  }
+  .actions { display: flex; gap: 5px; margin-top: 5px; }
+  .btn-add {
+    flex: 1;
+    background: #e6a817;
+    color: #fff;
+    border-radius: 7px;
+    padding: 6px;
+    font-size: 12px;
+    font-weight: 700;
+  }
+  .btn-add:hover { background: #d19a12; }
+  .btn-board {
+    background: rgba(255,255,255,0.6);
+    border: 1px solid rgba(140,115,45,0.3);
+    border-radius: 7px;
+    padding: 6px 9px;
+    font-size: 11.5px;
+    color: #6b5a25;
+  }
+  .btn-board:hover { background: rgba(255,255,255,0.85); }
+</style>
+</head>
+<body>
+  <div class="postit">
+    <div class="bg bg-head"></div>
+    <div class="bg bg-mid"></div>
+    <div class="bg bg-foot"></div>
+    <div class="drag-strip"></div>
+    <button class="pinBtn" id="pinBtn" title="Fixar na tela">📌</button>
+    <button class="closeBtn" id="closeBtn">✕</button>
+
+    <div class="content">
+      <div class="head-line">
+        <h1>Hoje</h1>
+        <div class="date" id="dateLabel"></div>
+      </div>
+      <div class="list" id="list"></div>
+      <div class="composer">
+        <input type="text" id="taskText" placeholder="Nova tarefa..." maxlength="200" />
+        <div class="row">
+          <input type="date" id="taskDate" />
+          <label class="toggle"><input type="checkbox" id="hasTime" /> hora?</label>
+          <input type="time" id="taskTime" style="display:none" />
+        </div>
+        <div class="actions">
+          <button class="btn-add" id="addBtn">Adicionar</button>
+          <button class="btn-board" id="boardBtn">Ver todos</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script src="panel.js"></script>
+</body>
+</html>

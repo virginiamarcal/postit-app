@@ -1,0 +1,13 @@
+{
+  "name": "postit-app",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Post-it de bandeja para lembretes e agenda",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "devDependencies": {
+    "electron": "^33.0.0"
+  }
+}
