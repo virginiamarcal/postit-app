@@ -3,11 +3,48 @@
   "version": "1.0.0",
   "private": true,
   "description": "Post-it de bandeja para lembretes e agenda",
+  "author": "Virginia Lara Marçal",
+  "license": "MIT",
   "main": "main.js",
   "scripts": {
-    "start": "electron ."
+    "start": "electron .",
+    "dist": "electron-builder --win"
   },
   "devDependencies": {
-    "electron": "^33.0.0"
+    "electron": "^33.0.0",
+    "electron-builder": "^25.1.8"
+  },
+  "build": {
+    "appId": "com.virginia.postit",
+    "productName": "Post-it",
+    "copyright": "Copyright © 2026 Virginia Lara Marçal",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "main.js",
+      "preload.js",
+      "store.js",
+      "renderer/**/*",
+      "assets/skins/**/*",
+      "LICENSE"
+    ],
+    "win": {
+      "target": "nsis",
+      "icon": "assets/skins/gatinho-laranja/app.png",
+      "artifactName": "Post-it-${version}-instalador.${ext}"
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "Post-it",
+      "installerLanguages": [
+        "pt_BR"
+      ],
+      "language": "1046"
+    }
   }
 }

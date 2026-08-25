@@ -287,11 +287,14 @@ function checkToasts() {
 }
 
 function setAutoStart(enabled) {
-  app.setLoginItemSettings({
-    openAtLogin: enabled,
-    path: process.execPath,
-    args: [path.resolve(__dirname)],
-  });
+  const opts = { openAtLogin: enabled };
+  // Instalado, o próprio executável sobe sozinho. Em desenvolvimento é preciso
+  // dizer ao Electron qual projeto abrir, senão ele subiria vazio.
+  if (!app.isPackaged) {
+    opts.path = process.execPath;
+    opts.args = [path.resolve(__dirname)];
+  }
+  app.setLoginItemSettings(opts);
   store.setSetting('autoStart', enabled);
 }
 
@@ -343,6 +346,16 @@ function showAbout() {
   }).then(({ response }) => {
     if (response === 0) shell.openExternal(AUTOR.instagram);
     if (response === 1) shell.openExternal(AUTOR.github);
+  });
+}
+
+// Um post-it só. Sem isso, abrir o atalho de novo criaria uma segunda cópia
+// disputando o mesmo arquivo de tarefas.
+if (!app.requestSingleInstanceLock()) {
+  app.quit();
+} else {
+  app.on('second-instance', () => {
+    if (panelWin && !panelWin.isDestroyed()) showPanel();
   });
 }
 

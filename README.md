@@ -14,13 +14,32 @@ Um post-it de lembretes para Windows que fica na barra de tarefas e **pisca quan
 - **Quadro "Ver todos".** Mostra os agendamentos futuros como post-its espalhados, que podem ser arrastados e ficam onde você soltar.
 - **Inicia com o Windows** (pode ser desligado no menu do ícone da bandeja).
 
-## Como rodar
+## Instalar
 
-Precisa de [Node.js](https://nodejs.org) instalado.
+Baixe o instalador na página de
+[Releases](https://github.com/virginiamarcal/postit-app/releases), abra e
+avance. Não precisa instalar mais nada.
+
+> O Windows pode mostrar um aviso azul de "Windows protegeu o computador".
+> Isso aparece em todo programa sem certificado digital pago — clique em
+> **Mais informações** e depois em **Executar assim mesmo**.
+
+Depois de instalar, o gatinho aparece na barra de tarefas e o programa passa a
+abrir junto com o Windows (dá para desligar no menu do ícone da bandeja).
+
+## Rodar a partir do código
+
+Só para quem quiser mexer no projeto. Precisa de [Node.js](https://nodejs.org).
 
 ```bash
 npm install
 npm start
+```
+
+Para gerar o instalador:
+
+```bash
+npm run dist
 ```
 
 ## Trocar o papel do post-it 🐾
