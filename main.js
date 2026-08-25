@@ -86,10 +86,17 @@ function updateAlertState() {
   }
 }
 
-const PANEL_W = 420;
-const PANEL_H = 600;
+const { panelSizeFor } = require('./renderer/skin.js');
+
 const BLUR_GRACE_MS = 600;
 let shownAt = 0;
+
+// Cada arte tem o papel numa largura diferente dentro do PNG. A janela se ajusta
+// para o papel sair sempre com a mesma largura útil, em vez de sobrar vão
+// transparente nas artes de papel estreito.
+function panelSize() {
+  return panelSizeFor(currentSkin());
+}
 
 const isPinned = () => store.getSetting('pinned', false);
 
@@ -116,6 +123,8 @@ function setSkin(id) {
     tray.setImage(store.hasPendingToday(todayStr()) ? iconAlert() : iconNormal());
     tray.setContextMenu(buildContextMenu());
   }
+  // O novo papel pode ter outra proporção: a janela acompanha.
+  if (panelWin && !panelWin.isDestroyed()) positionPanel();
   for (const w of [panelWin, boardWin]) {
     if (w && !w.isDestroyed()) w.webContents.send('skin-changed', currentSkin());
   }
@@ -130,9 +139,10 @@ function broadcastChange() {
 }
 
 function createPanel() {
+  const size = panelSize();
   panelWin = new BrowserWindow({
-    width: PANEL_W,
-    height: PANEL_H,
+    width: size.width,
+    height: size.height,
     show: false,
     frame: false,
     transparent: true,
@@ -190,24 +200,26 @@ function createPanel() {
 }
 
 function positionPanel() {
+  const { width, height } = panelSize();
+
   // Fixado, respeita o canto onde a usuária largou a nota.
   const saved = store.getSetting('panelPos', null);
   if (isPinned() && saved) {
     const visible = screen.getAllDisplays().some((d) => {
       const a = d.workArea;
-      return saved.x < a.x + a.width && saved.x + PANEL_W > a.x &&
-             saved.y < a.y + a.height && saved.y + PANEL_H > a.y;
+      return saved.x < a.x + a.width && saved.x + width > a.x &&
+             saved.y < a.y + a.height && saved.y + height > a.y;
     });
     if (visible) {
-      panelWin.setBounds({ x: saved.x, y: saved.y, width: PANEL_W, height: PANEL_H });
+      panelWin.setBounds({ x: saved.x, y: saved.y, width, height });
       return;
     }
   }
   const display = screen.getDisplayNearestPoint(screen.getCursorScreenPoint());
   const work = display.workArea;
-  const x = work.x + work.width - PANEL_W - 12;
-  const y = work.y + work.height - PANEL_H - 12;
-  panelWin.setBounds({ x, y, width: PANEL_W, height: PANEL_H });
+  const x = work.x + work.width - width - 12;
+  const y = work.y + work.height - height - 12;
+  panelWin.setBounds({ x, y, width, height });
 }
 
 function showPanel() {

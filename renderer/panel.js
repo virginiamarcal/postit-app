@@ -13,9 +13,15 @@ const skinBtn = document.getElementById('skinBtn');
 const skinPicker = document.getElementById('skinPicker');
 const skinGrid = document.getElementById('skinGrid');
 
+let currentSkin = null;
+
 function paintSkin(skin) {
-  applySkin(postitEl, skin, { width: 420 });
+  if (skin) currentSkin = skin;
+  applySkin(postitEl, currentSkin, { width: postitEl.clientWidth });
 }
+
+// A janela muda de tamanho conforme o papel; as medidas precisam acompanhar.
+window.addEventListener('resize', () => paintSkin(null));
 
 async function buildSkinPicker() {
   const { skins, currentId } = await window.api.listSkins();

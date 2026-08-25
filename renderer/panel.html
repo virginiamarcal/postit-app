@@ -9,16 +9,17 @@
      papel  -> x 132..1099 | y 390..1210
      head   -> y 0..620  | mid -> y 700..760 | foot -> y 1010..1268
      escala = 420 / 1240 = 0.3387 */
+  /* A janela é dimensionada por papel (skin.js/panelSizeFor); aqui só acompanha. */
   html, body {
-    width: 420px;
-    height: 600px;
+    width: 100%;
+    height: 100%;
     overflow: hidden;
     background: transparent;
   }
   .postit {
     position: relative;
-    width: 420px;
-    height: 600px;
+    width: 100%;
+    height: 100%;
     filter: drop-shadow(3px 8px 14px rgba(0,0,0,0.35));
   }
   /* As medidas vêm do papel escolhido (renderer/skin.js). */
@@ -48,9 +49,11 @@
     align-items: center;
     justify-content: center;
   }
-  .closeBtn { right: 56px; }
-  .pinBtn   { right: 80px; }
-  .skinBtn  { right: 104px; }
+  /* Alinhados pela borda do papel, não por pixel fixo: a margem do papel muda
+     de uma arte para outra e valor fixo joga os botões para fora dele. */
+  .closeBtn { right: var(--paper-right, 56px); }
+  .pinBtn   { right: calc(var(--paper-right, 56px) + 24px); }
+  .skinBtn  { right: calc(var(--paper-right, 56px) + 48px); }
   .topBtn:hover { background: rgba(120,95,30,0.28); }
   .pinBtn.on { background: #e6a817; color: #fff; }
   .pinBtn.on:hover { background: #d19a12; }

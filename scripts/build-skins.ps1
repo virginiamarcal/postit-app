@@ -143,9 +143,11 @@ foreach ($file in $files) {
     $headH = $paper.Top + [int]($paperH * 0.28)
     # base: o rodape, onde costuma ficar a dobrinha
     $footH = $bmp.Height - ($paper.Bottom - [int]($paperH * 0.22))
-    # meio: faixa fina tirada do miolo limpo do papel
-    $midTop = $paper.Top + [int]($paperH * 0.45)
-    $midH = 60
+    # meio: exatamente a faixa entre o topo e o rodape. Uma tira fina esticada
+    # varias vezes borra a textura do papel em riscos verticais; pegando a faixa
+    # inteira, a interface quase nao precisa esticar.
+    $midTop = $headH
+    $midH = ($bmp.Height - $footH) - $midTop
 
     $dir = Join-Path $outRoot $slug
     if (-not (Test-Path $dir)) { New-Item -ItemType Directory -Path $dir | Out-Null }
@@ -158,13 +160,6 @@ foreach ($file in $files) {
     Save-Thumb $bmp $paper (Join-Path $dir "tray-alert.png") 32 $true
     Save-Thumb $bmp $paper (Join-Path $dir "app.png") 256 $false
 
-    # A dobrinha fica no canto inferior direito, dentro do papel. Reservamos esse
-    # canto para o texto e os botoes nao passarem por cima dela. E uma estimativa
-    # sobre a largura do papel: se numa arte a dobra for maior ou menor, basta
-    # ajustar "curl" na mao em skins.json (o valor sobrevive ate rodar de novo).
-    $paperW = $paper.Right - $paper.Left
-    $curl = [int]($paperW * 0.20)
-
     $skins += [ordered]@{
       id     = $slug
       name   = Prettify $slug
@@ -173,7 +168,6 @@ foreach ($file in $files) {
       headH  = $headH
       midH   = $midH
       footH  = $footH
-      curl   = $curl
       paper  = [ordered]@{
         left = $paper.Left; right = $paper.Right
         top = $paper.Top;  bottom = $paper.Bottom
