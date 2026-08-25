@@ -2,8 +2,16 @@
 #
 # Alguns geradores de imagem exportam o quadriculado cinza como pixel de verdade,
 # em vez de um canal alfa. Aqui o fundo e apagado por preenchimento a partir das
-# bordas: so sai o que esta ligado ao contorno da imagem, entao patinhas e pelos
-# brancos no meio do desenho continuam intactos.
+# bordas: so sai o que esta ligado ao contorno da imagem.
+#
+# LIMITE CONHECIDO: isto e um remendo, nao substitui uma arte com alfa de verdade.
+# Funciona bem em desenho com contorno definido. Em FOTO REAL, pelo branco claro
+# (patinha, queixo) se dissolve no fundo sem fronteira nitida -- o preenchimento
+# atravessa a beirada e come o pelo por dentro. Se a arte for foto, peca ao
+# gerador um PNG com fundo transparente em vez de usar este script.
+#
+# Confira o resultado antes de usar: abra o PNG sobre um fundo colorido e veja se
+# nao faltou pedaco do bichinho.
 #
 # Uso:  powershell -File scripts/fix-transparency.ps1 assets/skins-src/arte.png
 

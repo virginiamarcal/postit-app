@@ -97,22 +97,6 @@
                                 }
                   },
                   {
-                      "id":  "tigrado-creme",
-                      "name":  "Tigrado real",
-                      "width":  1254,
-                      "height":  1254,
-                      "headH":  701,
-                      "midH":  60,
-                      "footH":  232,
-                      "curl":  155,
-                      "paper":  {
-                                    "left":  241,
-                                    "right":  1017,
-                                    "top":  521,
-                                    "bottom":  1163
-                                }
-                  },
-                  {
                       "id":  "tricolor-rosa",
                       "name":  "Tricolor",
                       "width":  1254,

@@ -65,8 +65,14 @@ powershell -File scripts/fix-transparency.ps1 -Path assets/skins-src/arte.png
 ```
 
 O fundo é apagado por preenchimento a partir das bordas, então só sai o que está
-ligado ao contorno — patinhas e pelos brancos no meio do desenho ficam intactos.
-O original é guardado ao lado como `arte.original.png`.
+ligado ao contorno. O original é guardado ao lado como `arte.original.png`.
+
+⚠️ **É um remendo, não substitui alfa de verdade.** Funciona bem em desenho com
+contorno definido. Em **foto real** o pelo branco claro (patinha, queixo) se
+dissolve no fundo sem fronteira nítida, e o preenchimento atravessa a beirada e
+come o pelo por dentro. Se a arte for foto, peça ao gerador um PNG com fundo
+transparente em vez de usar o script — e confira o resultado abrindo o PNG sobre
+um fundo colorido antes de gerar as fatias.
 
 Se numa arte a dobrinha do canto ficar por baixo dos botões, ajuste `curl` (em
 pixels da arte original) no papel correspondente dentro de
