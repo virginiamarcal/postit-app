@@ -54,6 +54,9 @@
   .closeBtn { right: var(--paper-right, 56px); }
   .pinBtn   { right: calc(var(--paper-right, 56px) + 24px); }
   .skinBtn  { right: calc(var(--paper-right, 56px) + 48px); }
+  .aguaBtn  { right: calc(var(--paper-right, 56px) + 72px); }
+  .aguaBtn.on { background: #4aa3d8; color: #fff; }
+  .aguaBtn.on:hover { background: #3f8fbf; }
   .topBtn:hover { background: rgba(120,95,30,0.28); }
   .pinBtn.on { background: #e6a817; color: #fff; }
   .pinBtn.on:hover { background: #d19a12; }
@@ -73,6 +76,65 @@
     display: none;
   }
   .skinPicker.open { display: block; }
+
+  /* Ajustes do lembrete de água */
+  .aguaPanel {
+    position: absolute;
+    top: calc(var(--paper-top, 138px) + 26px);
+    left: var(--paper-left, 45px);
+    right: var(--paper-right, 48px);
+    z-index: 7;
+    background: rgba(255,255,255,0.96);
+    border: 1px solid rgba(140,115,45,0.3);
+    border-radius: 10px;
+    padding: 10px;
+    box-shadow: 0 6px 16px rgba(0,0,0,0.18);
+    display: none;
+  }
+  .aguaPanel.open { display: block; }
+  .aguaPanel .label {
+    font-size: 10.5px;
+    color: #8a7238;
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+  .aguaLinha {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    font-size: 12px;
+    color: #4a3d16;
+    margin-bottom: 8px;
+  }
+  .aguaLinha select {
+    font-family: inherit;
+    font-size: 11.5px;
+    border: 1px solid rgba(140,115,45,0.3);
+    background: #fff;
+    border-radius: 6px;
+    padding: 3px 5px;
+    color: #4a3d16;
+  }
+  .aguaLinha input[type=checkbox] { width: 15px; height: 15px; }
+  .aguaPanel .obs {
+    font-size: 10px;
+    color: #97854e;
+    line-height: 1.4;
+    border-top: 1px solid rgba(140,115,45,0.18);
+    padding-top: 7px;
+  }
+  .aguaPanel .testar {
+    background: rgba(74,163,216,0.15);
+    color: #2c6d95;
+    border-radius: 6px;
+    padding: 4px 8px;
+    font-size: 11px;
+    font-weight: 600;
+    width: 100%;
+    margin-bottom: 8px;
+  }
+  .aguaPanel .testar:hover { background: rgba(74,163,216,0.3); }
   .skinPicker .label {
     font-size: 10.5px;
     color: #8a7238;
@@ -239,6 +301,7 @@
     <div class="bg bg-mid"></div>
     <div class="bg bg-foot"></div>
     <div class="drag-strip"></div>
+    <button class="topBtn aguaBtn" id="aguaBtn" title="Lembrete de água">💧</button>
     <button class="topBtn skinBtn" id="skinBtn" title="Trocar o papel">🐾</button>
     <button class="topBtn pinBtn" id="pinBtn" title="Fixar na tela">📌</button>
     <button class="topBtn closeBtn" id="closeBtn">✕</button>
@@ -246,6 +309,33 @@
     <div class="skinPicker" id="skinPicker">
       <div class="label">Escolha o papel</div>
       <div class="skinGrid" id="skinGrid"></div>
+    </div>
+
+    <div class="aguaPanel" id="aguaPanel">
+      <div class="label">Lembrete de água</div>
+      <div class="aguaLinha">
+        <label for="aguaAtivo">O gatinho me lembra</label>
+        <input type="checkbox" id="aguaAtivo" />
+      </div>
+      <div class="aguaLinha">
+        <label for="aguaIntervalo">De quanto em quanto</label>
+        <select id="aguaIntervalo">
+          <option value="30">30 minutos</option>
+          <option value="45">45 minutos</option>
+          <option value="60">1 hora</option>
+          <option value="90">1 hora e meia</option>
+          <option value="120">2 horas</option>
+        </select>
+      </div>
+      <div class="aguaLinha">
+        <label for="aguaSom">Com miau baixinho</label>
+        <input type="checkbox" id="aguaSom" />
+      </div>
+      <button class="testar" id="aguaTestar">Ver como fica</button>
+      <div class="obs">
+        Ele fica quieto das 22h às 8h, e não aparece se você estiver longe do
+        computador.
+      </div>
     </div>
 
     <div class="content">

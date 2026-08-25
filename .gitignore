@@ -20,3 +20,8 @@ assets/skins-src/_pendente/
 
 # saida do empacotador
 dist/
+
+# som pessoal: cada um coloca o seu (ver assets/sounds/LEIA-ME.md)
+assets/sounds/*.mp3
+assets/sounds/*.wav
+assets/sounds/*.ogg

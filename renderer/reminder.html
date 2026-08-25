@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<title>Post-it — lembrete</title>
+<link rel="stylesheet" href="shared.css" />
+<style>
+  html, body {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background: transparent;
+  }
+  .postit {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    filter: drop-shadow(3px 8px 14px rgba(0,0,0,0.32));
+    /* entra deslizando de baixo */
+    transform: translateY(115%);
+    opacity: 0;
+    transition: transform .5s cubic-bezier(.22,1,.36,1), opacity .35s ease;
+    cursor: pointer;
+  }
+  .postit.entrou { transform: translateY(0); opacity: 1; }
+  .postit.saindo { transform: translateY(115%); opacity: 0; }
+
+  .bg { position: absolute; left: 0; width: 100%; background-repeat: no-repeat; background-size: 100% 100%; }
+  .bg-head { top: 0; height: var(--head-h, 130px); background-image: var(--head-img); }
+  .bg-mid  { top: var(--head-h, 130px); bottom: var(--foot-h, 50px); background-image: var(--mid-img); }
+  .bg-foot { bottom: 0; height: var(--foot-h, 50px); background-image: var(--foot-img); }
+
+  .recado {
+    position: absolute;
+    left: var(--paper-left, 30px);
+    right: var(--paper-right, 32px);
+    top: var(--paper-top, 90px);
+    bottom: var(--paper-bottom, 55px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 1.35;
+    color: #4a3d16;
+    word-break: break-word;
+  }
+</style>
+</head>
+<body>
+  <div class="postit" id="postit">
+    <div class="bg bg-head"></div>
+    <div class="bg bg-mid"></div>
+    <div class="bg bg-foot"></div>
+    <div class="recado" id="recado"></div>
+  </div>
+  <script src="skin.js"></script>
+  <script src="reminder.js"></script>
+</body>
+</html>

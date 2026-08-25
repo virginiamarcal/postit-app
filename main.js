@@ -1,4 +1,4 @@
-const { app, BrowserWindow, Tray, Menu, ipcMain, screen, Notification, nativeImage, shell, dialog } = require('electron');
+const { app, BrowserWindow, Tray, Menu, ipcMain, screen, Notification, nativeImage, shell, dialog, powerMonitor } = require('electron');
 const path = require('path');
 const fs = require('fs');
 const { Store } = require('./store');
@@ -94,6 +94,40 @@ function updateAlertState() {
 }
 
 const { panelSizeFor } = require('./renderer/skin.js');
+
+// ---- lembrete de água ----
+const RECADOS_AGUA = [
+  'Hora de se hidratar! 💧',
+  'Bebe mais um copo de água… faz bem.',
+  'Água! Seu corpo agradece.',
+  'Pausa pra um gole de água?',
+  'Já bebeu água agora há pouco? Vai lá.',
+  'Um copinho de água e já volto a te deixar em paz 😺',
+  'Lembrete peludo: água.',
+];
+const LEMBRETE_W = 260;        // largura do mini post-it
+const LEMBRETE_SEG = 12;       // quanto tempo fica na tela
+const OCIOSO_SEG = 300;        // se ficou 5 min sem mexer, não está aí para ler
+let reminderWin = null;
+let lembreteTimer = null;
+let saidaTimer = null;
+
+const aguaConfig = () => ({
+  ativo: false,
+  intervaloMin: 60,
+  som: true,
+  inicioQuieto: 22,  // não incomoda entre 22h
+  fimQuieto: 8,      // e 8h da manhã
+  ...(store ? store.getSetting('agua', {}) : {}),
+});
+
+function dentroDoSilencio(cfg) {
+  const h = new Date().getHours();
+  // janela que atravessa a meia-noite (ex.: 22h às 8h)
+  return cfg.inicioQuieto > cfg.fimQuieto
+    ? h >= cfg.inicioQuieto || h < cfg.fimQuieto
+    : h >= cfg.inicioQuieto && h < cfg.fimQuieto;
+}
 
 const BLUR_GRACE_MS = 600;
 let shownAt = 0;
@@ -271,6 +305,113 @@ function createBoard() {
   boardWin.once('ready-to-show', () => boardWin.show());
 }
 
+function criarReminderWin() {
+  const skin = currentSkin();
+  const scale = skin ? LEMBRETE_W / skin.width : 0.21;
+  const altura = skin
+    ? Math.round((skin.headH + skin.footH) * scale) + 78
+    : 250;
+
+  reminderWin = new BrowserWindow({
+    width: LEMBRETE_W,
+    height: altura,
+    show: false,
+    frame: false,
+    transparent: true,
+    backgroundColor: '#00000000',
+    resizable: false,
+    skipTaskbar: true,
+    alwaysOnTop: true,
+    // não rouba o foco: não pode interromper quem está digitando, nem
+    // minimizar o painel por tirar o foco dele
+    focusable: false,
+    webPreferences: {
+      preload: path.join(__dirname, 'preload.js'),
+      contextIsolation: true,
+    },
+  });
+  reminderWin.setAlwaysOnTop(true, 'screen-saver');
+  reminderWin.loadFile(path.join(__dirname, 'renderer', 'reminder.html'));
+  reminderWin.on('closed', () => { reminderWin = null; });
+  return reminderWin;
+}
+
+function posicionarLembrete() {
+  const display = screen.getDisplayNearestPoint(screen.getCursorScreenPoint());
+  const work = display.workArea;
+  const { width, height } = reminderWin.getBounds();
+  reminderWin.setBounds({
+    x: work.x + work.width - width - 16,
+    y: work.y + work.height - height - 16,
+    width,
+    height,
+  });
+}
+
+function esconderLembrete() {
+  clearTimeout(saidaTimer);
+  if (!reminderWin || reminderWin.isDestroyed()) return;
+  reminderWin.webContents.send('lembrete-saindo');
+  // espera a animação de saída antes de sumir de verdade
+  saidaTimer = setTimeout(() => {
+    if (reminderWin && !reminderWin.isDestroyed()) reminderWin.hide();
+  }, 550);
+}
+
+function mostrarLembrete(texto) {
+  if (!reminderWin || reminderWin.isDestroyed()) criarReminderWin();
+
+  const enviar = () => {
+    posicionarLembrete();
+    reminderWin.showInactive();
+    reminderWin.setAlwaysOnTop(true, 'screen-saver');
+    reminderWin.webContents.send('lembrete', {
+      skin: currentSkin(),
+      texto,
+      som: aguaConfig().som !== false,
+    });
+    clearTimeout(saidaTimer);
+    saidaTimer = setTimeout(esconderLembrete, LEMBRETE_SEG * 1000);
+  };
+
+  if (reminderWin.webContents.isLoading()) {
+    reminderWin.webContents.once('did-finish-load', enviar);
+  } else {
+    enviar();
+  }
+}
+
+function tocarLembreteAgua() {
+  const cfg = aguaConfig();
+  if (!cfg.ativo) return;
+  if (dentroDoSilencio(cfg)) return;
+  // ninguém para ler: não adianta lembrar de beber água com a pessoa longe
+  if (powerMonitor.getSystemIdleTime() > OCIOSO_SEG) return;
+
+  const texto = RECADOS_AGUA[Math.floor(Math.random() * RECADOS_AGUA.length)];
+  mostrarLembrete(texto);
+}
+
+function reagendarAgua() {
+  clearInterval(lembreteTimer);
+  lembreteTimer = null;
+  const cfg = aguaConfig();
+  if (!cfg.ativo) {
+    esconderLembrete();
+    return;
+  }
+  lembreteTimer = setInterval(tocarLembreteAgua, cfg.intervaloMin * 60 * 1000);
+}
+
+function definirAgua(patch) {
+  store.setSetting('agua', { ...aguaConfig(), ...patch });
+  reagendarAgua();
+  if (tray) tray.setContextMenu(buildContextMenu());
+  if (panelWin && !panelWin.isDestroyed()) {
+    panelWin.webContents.send('agua-changed', aguaConfig());
+  }
+}
+
 function checkToasts() {
   const due = store.getDueForToast(todayStr(), nowHM());
   for (const t of due) {
@@ -309,6 +450,24 @@ function buildContextMenu() {
       type: 'checkbox',
       checked: isPinned(),
       click: (item) => setPinned(item.checked),
+    },
+    {
+      label: 'Lembrete de água',
+      submenu: [
+        {
+          label: 'Desligado',
+          type: 'radio',
+          checked: !aguaConfig().ativo,
+          click: () => definirAgua({ ativo: false }),
+        },
+        { type: 'separator' },
+        ...[30, 45, 60, 90, 120].map((m) => ({
+          label: m < 60 ? `A cada ${m} minutos` : `A cada ${m / 60} hora${m > 60 ? 's' : ''}`,
+          type: 'radio',
+          checked: aguaConfig().ativo && aguaConfig().intervaloMin === m,
+          click: () => definirAgua({ ativo: true, intervaloMin: m }),
+        })),
+      ],
     },
     {
       label: 'Trocar o papel',
@@ -390,6 +549,7 @@ app.whenReady().then(() => {
   updateAlertState();
   setInterval(checkToasts, 30 * 1000);
   checkToasts();
+  reagendarAgua();
 
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) togglePanel();
@@ -424,6 +584,13 @@ ipcMain.handle('tasks:updatePos', (_e, { id, x, y }) => {
   store.updateTask(id, { x, y });
   return true;
 });
+ipcMain.handle('agua:get', () => aguaConfig());
+ipcMain.handle('agua:set', (_e, patch) => {
+  definirAgua(patch);
+  return aguaConfig();
+});
+ipcMain.handle('agua:testar', () => mostrarLembrete(RECADOS_AGUA[0]));
+ipcMain.handle('lembrete:fechar', () => esconderLembrete());
 ipcMain.handle('autor:instagram', () => shell.openExternal(AUTOR.instagram));
 ipcMain.handle('skins:list', () => ({ skins, currentId: currentSkin()?.id || null }));
 ipcMain.handle('skins:current', () => currentSkin());

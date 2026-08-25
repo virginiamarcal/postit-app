@@ -42,10 +42,52 @@ async function buildSkinPicker() {
   }
 }
 
-skinBtn.addEventListener('click', () => skinPicker.classList.toggle('open'));
+// ---- lembrete de água ----
+const aguaBtn = document.getElementById('aguaBtn');
+const aguaPanel = document.getElementById('aguaPanel');
+const aguaAtivo = document.getElementById('aguaAtivo');
+const aguaIntervalo = document.getElementById('aguaIntervalo');
+const aguaSom = document.getElementById('aguaSom');
+
+function paintAgua(cfg) {
+  aguaAtivo.checked = !!cfg.ativo;
+  aguaIntervalo.value = String(cfg.intervaloMin);
+  aguaSom.checked = cfg.som !== false;
+  aguaBtn.classList.toggle('on', !!cfg.ativo);
+  aguaBtn.title = cfg.ativo
+    ? `Lembrete de água a cada ${cfg.intervaloMin} min`
+    : 'Lembrete de água (desligado)';
+}
+
+aguaBtn.addEventListener('click', () => {
+  aguaPanel.classList.toggle('open');
+  skinPicker.classList.remove('open');
+});
+aguaAtivo.addEventListener('change', async () => {
+  paintAgua(await window.api.setAgua({ ativo: aguaAtivo.checked }));
+});
+aguaIntervalo.addEventListener('change', async () => {
+  paintAgua(await window.api.setAgua({
+    ativo: true,
+    intervaloMin: Number(aguaIntervalo.value),
+  }));
+});
+aguaSom.addEventListener('change', async () => {
+  paintAgua(await window.api.setAgua({ som: aguaSom.checked }));
+});
+document.getElementById('aguaTestar').addEventListener('click', () => window.api.testarAgua());
+window.api.onAguaChanged(paintAgua);
+
+skinBtn.addEventListener('click', () => {
+  skinPicker.classList.toggle('open');
+  aguaPanel.classList.remove('open');
+});
 document.addEventListener('click', (e) => {
   if (!skinPicker.contains(e.target) && e.target !== skinBtn) {
     skinPicker.classList.remove('open');
+  }
+  if (!aguaPanel.contains(e.target) && e.target !== aguaBtn) {
+    aguaPanel.classList.remove('open');
   }
 });
 window.api.onSkinChanged((skin) => { paintSkin(skin); buildSkinPicker(); });
@@ -57,6 +99,7 @@ async function init() {
   dateLabel.textContent = `${WEEKDAYS[d.getDay()]}, ${d.getDate()} de ${MONTHS[d.getMonth()]}`;
   paintSkin(await window.api.getSkin());
   await buildSkinPicker();
+  paintAgua(await window.api.getAgua());
   paintPin(await window.api.getPinned());
   await render();
 }

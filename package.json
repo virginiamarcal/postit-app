@@ -27,6 +27,7 @@
       "store.js",
       "renderer/**/*",
       "assets/skins/**/*",
+      "assets/sounds/**/*",
       "LICENSE"
     ],
     "win": {

@@ -9,6 +9,7 @@ Um post-it de lembretes para Windows que fica na barra de tarefas e **pisca quan
 - **Alerta na barra de tarefas.** Havendo pendência para hoje, o botão do app pisca em laranja e ganha um selo vermelho sobre o ícone. O ícone da bandeja (perto do relógio) também pisca.
 - **Painel do dia.** Um clique abre o post-it sobre as janelas, com as tarefas de hoje e um campo para adicionar novas.
 - **Fixar na tela 📌.** Por padrão a nota sai da frente sozinha ao clicar fora. Fixada, ela fica presa por cima das janelas até você desafixar — e volta no mesmo canto onde foi largada.
+- **Lembrete de água 💧.** O gatinho aparece no canto da tela de tempos em tempos com um recado ("Hora de se hidratar!"). Você liga e escolhe o intervalo no próprio post-it. Ele fica quieto das 22h às 8h e não aparece se você estiver longe do computador — nada de encontrar oito lembretes empilhados na volta do almoço. Pode miar baixinho também, veja [assets/sounds](assets/sounds/LEIA-ME.md).
 - **Agenda.** Toda tarefa tem data; o horário é opcional — "qualquer horário" ou uma hora marcada.
 - **Notificação do Windows.** Tarefa com horário definido dispara um toast na hora marcada.
 - **Quadro "Ver todos".** Mostra os agendamentos futuros como post-its espalhados, que podem ser arrastados e ficam onde você soltar.
@@ -105,6 +106,7 @@ pixels da arte original) no papel correspondente dentro de
 | Fechar / sair da frente | Clicar fora, ou no ✕ — minimiza e continua na barra |
 | Fixar / desafixar | Botão 📌 no post-it (fica laranja quando fixado) ou o menu da bandeja |
 | Trocar o papel | Botão 🐾 no post-it, ou **Trocar o papel** no menu da bandeja |
+| Lembrete de água | Botão 💧 no post-it: liga, escolhe o intervalo e testa como fica |
 | Nova tarefa | Digitar, escolher a data, marcar `hora?` se tiver horário, e Adicionar |
 | Concluir | Clicar na bolinha ao lado da tarefa |
 | Ver agendamentos futuros | Botão **Ver todos** |
@@ -124,6 +126,7 @@ store.js                 persistência das tarefas em JSON
 renderer/skin.js         traduz as medidas do papel escolhido em variáveis de CSS
 renderer/panel.*         painel "Hoje" (janela transparente)
 renderer/board.*         quadro com os post-its espalhados
+renderer/reminder.*      mini post-it do lembrete de água, no canto da tela
 scripts/build-skins.ps1  detecta e recorta os papéis a partir de assets/skins-src
 assets/skins-src/        as artes originais (PNG com fundo transparente)
 assets/skins/            fatias, miniaturas, ícones e o manifesto skins.json
