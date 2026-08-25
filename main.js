@@ -96,6 +96,10 @@ function updateAlertState() {
 const { panelSizeFor } = require('./renderer/skin.js');
 
 // ---- lembrete de água ----
+// O gatinho aparece na lateral da tela segurando um copo d'água. O desenho já
+// diz o que precisa ser dito, então não há texto na tela: estas frases servem
+// de legenda para leitores de tela e para o aviso do Windows, que é o plano B
+// quando a skin não tem a arte.
 const RECADOS_AGUA = [
   'Hora de se hidratar! 💧',
   'Bebe mais um copo de água… faz bem.',
@@ -105,11 +109,18 @@ const RECADOS_AGUA = [
   'Um copinho de água e já volto a te deixar em paz 😺',
   'Lembrete peludo: água.',
 ];
-const LEMBRETE_W = 260;        // largura do mini post-it
 const LEMBRETE_SEG = 12;       // quanto tempo fica na tela
-const OCIOSO_SEG = 300;        // se ficou 5 min sem mexer, não está aí para ler
+// Só pula quem de fato saiu da frente do computador. Cinco minutos era pouco:
+// quem assiste uma reunião ou lê uma tela fica meia hora sem tocar no mouse, e
+// é justamente essa pessoa que esquece de beber água.
+const OCIOSO_SEG = 20 * 60;
+// E se pulou porque ela não estava lá, tenta de novo daqui a pouco, em vez de
+// perder a vez e sumir até o próximo ciclo.
+const RETENTAR_SEG = 3 * 60;
 let reminderWin = null;
 let lembreteTimer = null;
+let aguaTimeout = null;
+let retentarTimer = null;
 let saidaTimer = null;
 
 const aguaConfig = () => ({
@@ -305,16 +316,25 @@ function createBoard() {
   boardWin.once('ready-to-show', () => boardWin.show());
 }
 
-function criarReminderWin() {
-  const skin = currentSkin();
-  const scale = skin ? LEMBRETE_W / skin.width : 0.21;
-  const altura = skin
-    ? Math.round((skin.headH + skin.footH) * scale) + 78
-    : 250;
+// A arte do lembrete é a do gato escolhido. Se essa skin ainda não tiver uma,
+// vale a de qualquer outra: melhor um gatinho diferente do que nenhum aviso.
+function arteDeAgua() {
+  const atual = currentSkin();
+  const ids = [...(atual ? [atual.id] : []), ...skins.map((s) => s.id)];
+  for (const id of ids) {
+    const arquivo = path.join(SKINS_DIR, id, 'agua.png');
+    if (!fs.existsSync(arquivo)) continue;
+    const { width, height } = nativeImage.createFromPath(arquivo).getSize();
+    if (!width || !height) continue;
+    return { url: `file:///${arquivo.replace(/\\/g, '/')}`, width, height };
+  }
+  return null;
+}
 
+function criarReminderWin(arte) {
   reminderWin = new BrowserWindow({
-    width: LEMBRETE_W,
-    height: altura,
+    width: arte.width,
+    height: arte.height,
     show: false,
     frame: false,
     transparent: true,
@@ -336,13 +356,17 @@ function criarReminderWin() {
   return reminderWin;
 }
 
-function posicionarLembrete() {
+// Encostado na borda direita, na altura dos olhos. Sem folga nenhuma: a arte
+// tem o lado direito reto de propósito, e é o encaixe na beirada que dá a
+// impressão de que o gato está espiando de trás da tela.
+function posicionarLembrete(arte) {
   const display = screen.getDisplayNearestPoint(screen.getCursorScreenPoint());
   const work = display.workArea;
-  const { width, height } = reminderWin.getBounds();
+  const height = Math.min(arte.height, work.height);
+  const width = Math.round(arte.width * (height / arte.height));
   reminderWin.setBounds({
-    x: work.x + work.width - width - 16,
-    y: work.y + work.height - height - 16,
+    x: work.x + work.width - width,
+    y: work.y + Math.round((work.height - height) / 2),
     width,
     height,
   });
@@ -359,14 +383,23 @@ function esconderLembrete() {
 }
 
 function mostrarLembrete(texto) {
-  if (!reminderWin || reminderWin.isDestroyed()) criarReminderWin();
+  const arte = arteDeAgua();
+  if (!arte) {
+    // Nenhuma skin tem a arte: avisa pelo Windows mesmo, sem gatinho.
+    if (Notification.isSupported()) {
+      new Notification({ title: 'Post-it', body: texto }).show();
+    }
+    return;
+  }
+
+  if (!reminderWin || reminderWin.isDestroyed()) criarReminderWin(arte);
 
   const enviar = () => {
-    posicionarLembrete();
+    posicionarLembrete(arte);
     reminderWin.showInactive();
     reminderWin.setAlwaysOnTop(true, 'screen-saver');
     reminderWin.webContents.send('lembrete', {
-      skin: currentSkin(),
+      arte: arte.url,
       texto,
       som: aguaConfig().som !== false ? caminhoDoMiau() : null,
     });
@@ -397,22 +430,49 @@ function tocarLembreteAgua() {
   const cfg = aguaConfig();
   if (!cfg.ativo) return;
   if (dentroDoSilencio(cfg)) return;
-  // ninguém para ler: não adianta lembrar de beber água com a pessoa longe
-  if (powerMonitor.getSystemIdleTime() > OCIOSO_SEG) return;
 
+  // ninguém na frente: guarda a vez e volta daqui a pouco
+  if (powerMonitor.getSystemIdleTime() > OCIOSO_SEG) {
+    clearTimeout(retentarTimer);
+    retentarTimer = setTimeout(tocarLembreteAgua, RETENTAR_SEG * 1000);
+    return;
+  }
+
+  // só conta como lembrete dado o que a pessoa teve chance de ver
+  store.setSetting('aguaUltimo', Date.now());
   const texto = RECADOS_AGUA[Math.floor(Math.random() * RECADOS_AGUA.length)];
   mostrarLembrete(texto);
 }
 
+// A contagem tem que sobreviver a desligar o computador. Antes ela vivia só no
+// setInterval, que recomeça do zero a cada abertura do programa: quem reinicia
+// antes do intervalo terminar nunca chega a ver o lembrete uma vez sequer.
+// Agora a hora do último lembrete fica gravada, e ao abrir o programa a espera
+// é só o que falta dela.
 function reagendarAgua() {
   clearInterval(lembreteTimer);
+  clearTimeout(aguaTimeout);
+  clearTimeout(retentarTimer);
   lembreteTimer = null;
+  aguaTimeout = null;
+  retentarTimer = null;
+
   const cfg = aguaConfig();
   if (!cfg.ativo) {
     esconderLembrete();
     return;
   }
-  lembreteTimer = setInterval(tocarLembreteAgua, cfg.intervaloMin * 60 * 1000);
+
+  const periodo = cfg.intervaloMin * 60 * 1000;
+  const decorrido = Date.now() - (store.getSetting('aguaUltimo', 0) || 0);
+  // nunca na mesma hora em que o programa abre: dá tempo de a área de trabalho
+  // terminar de carregar antes de um gato pular na tela
+  const espera = Math.max(20 * 1000, periodo - decorrido);
+
+  aguaTimeout = setTimeout(() => {
+    tocarLembreteAgua();
+    lembreteTimer = setInterval(tocarLembreteAgua, periodo);
+  }, espera);
 }
 
 function definirAgua(patch) {

@@ -9,7 +9,7 @@ Um post-it de lembretes para Windows que fica na barra de tarefas e **pisca quan
 - **Alerta na barra de tarefas.** Havendo pendência para hoje, o botão do app pisca em laranja e ganha um selo vermelho sobre o ícone. O ícone da bandeja (perto do relógio) também pisca.
 - **Painel do dia.** Um clique abre o post-it sobre as janelas, com as tarefas de hoje e um campo para adicionar novas.
 - **Fixar na tela 📌.** Por padrão a nota sai da frente sozinha ao clicar fora. Fixada, ela fica presa por cima das janelas até você desafixar — e volta no mesmo canto onde foi largada.
-- **Lembrete de água 💧.** O gatinho aparece no canto da tela de tempos em tempos com um recado ("Hora de se hidratar!"). Você liga e escolhe o intervalo no próprio post-it. Ele fica quieto das 22h às 8h e não aparece se você estiver longe do computador — nada de encontrar oito lembretes empilhados na volta do almoço. Pode miar baixinho também, veja [assets/sounds](assets/sounds/LEIA-ME.md).
+- **Lembrete de água 💧.** De tempos em tempos o gatinho espia pela lateral da tela oferecendo um copo d'água, e some sozinho depois de alguns segundos. Não há texto: o desenho já diz. Cada papel tem o seu gato. Você liga e escolhe o intervalo no próprio post-it. Ele fica quieto das 22h às 8h, e se você não estiver na frente do computador ele guarda a vez e volta daqui a pouco, em vez de perder o horário. Pode miar baixinho também, veja [assets/sounds](assets/sounds/LEIA-ME.md).
 - **Agenda.** Toda tarefa tem data; o horário é opcional — "qualquer horário" ou uma hora marcada.
 - **Notificação do Windows.** Tarefa com horário definido dispara um toast na hora marcada.
 - **Quadro "Ver todos".** Mostra os agendamentos futuros como post-its espalhados, que podem ser arrastados e ficam onde você soltar.
@@ -98,6 +98,29 @@ Se numa arte a dobrinha do canto ficar por baixo dos botões, ajuste `curl` (em
 pixels da arte original) no papel correspondente dentro de
 `assets/skins/skins.json`. Valor maior afasta mais o conteúdo do canto.
 
+### Dar um gatinho de água ao papel novo 💧
+
+O lembrete de água usa uma segunda arte: o gato espiando por uma borda vertical,
+segurando um copo. Coloque o PNG em `assets/agua-src/`, aponte para qual papel
+ele pertence na tabela `$paraSkin` no alto de `scripts/build-agua.ps1`, e rode:
+
+```powershell
+powershell -File scripts/build-agua.ps1
+```
+
+O script acha o desenho dentro da imagem, corta o vazio em volta e grava
+`agua.png` dentro da pasta do papel. Papel sem arte de água não fica sem
+lembrete: ele empresta o gatinho de outro.
+
+**A arte precisa ser:** o bichinho encostado numa **borda reta do lado direito**
+— é essa borda que encaixa na lateral da tela e cria a impressão de que ele está
+espiando por trás dela.
+
+Se o gerador entregar a imagem com o contorno rosa (ou verde) do fundo grudado na
+beirada, não precisa pedir de novo: o script desfaz essa mistura sozinho e ainda
+apaga o que sobrar. O que ele **não** inventa é transparência — a arte tem que
+vir com canal alfa de verdade.
+
 ## Uso
 
 | Ação | Como |
@@ -107,6 +130,7 @@ pixels da arte original) no papel correspondente dentro de
 | Fixar / desafixar | Botão 📌 no post-it (fica laranja quando fixado) ou o menu da bandeja |
 | Trocar o papel | Botão 🐾 no post-it, ou **Trocar o papel** no menu da bandeja |
 | Lembrete de água | Botão 💧 no post-it: liga, escolhe o intervalo e testa como fica |
+| Dispensar o gatinho da água | Clicar nele (ou esperar: some sozinho) |
 | Nova tarefa | Digitar, escolher a data, marcar `hora?` se tiver horário, e Adicionar |
 | Concluir | Clicar na bolinha ao lado da tarefa |
 | Ver agendamentos futuros | Botão **Ver todos** |
@@ -126,9 +150,11 @@ store.js                 persistência das tarefas em JSON
 renderer/skin.js         traduz as medidas do papel escolhido em variáveis de CSS
 renderer/panel.*         painel "Hoje" (janela transparente)
 renderer/board.*         quadro com os post-its espalhados
-renderer/reminder.*      mini post-it do lembrete de água, no canto da tela
+renderer/reminder.*      o gatinho do lembrete de água, na lateral da tela
 scripts/build-skins.ps1  detecta e recorta os papéis a partir de assets/skins-src
+scripts/build-agua.ps1   limpa e recorta as artes de água de assets/agua-src
 assets/skins-src/        as artes originais (PNG com fundo transparente)
+assets/agua-src/         as artes originais do lembrete de água
 assets/skins/            fatias, miniaturas, ícones e o manifesto skins.json
 ```
 
