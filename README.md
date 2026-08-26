@@ -9,7 +9,7 @@ Um post-it de lembretes para Windows que fica na barra de tarefas e **pisca quan
 - **Alerta na barra de tarefas.** Havendo pendência para hoje, o botão do app pisca em laranja e ganha um selo vermelho sobre o ícone. O ícone da bandeja (perto do relógio) também pisca.
 - **Painel do dia.** Um clique abre o post-it sobre as janelas, com as tarefas de hoje e um campo para adicionar novas.
 - **Fixar na tela 📌.** Por padrão a nota sai da frente sozinha ao clicar fora. Fixada, ela fica presa por cima das janelas até você desafixar — e volta no mesmo canto onde foi largada.
-- **Lembrete de água 💧.** De tempos em tempos o gatinho espia pela lateral da tela oferecendo um copo d'água, e some sozinho depois de alguns segundos. Não há texto: o desenho já diz. Cada papel tem o seu gato. Você liga e escolhe o intervalo no próprio post-it. Ele fica quieto das 22h às 8h, e se você não estiver na frente do computador ele guarda a vez e volta daqui a pouco, em vez de perder o horário. Pode miar baixinho também, veja [assets/sounds](assets/sounds/LEIA-ME.md).
+- **Lembrete de água 💧.** De tempos em tempos o gatinho espia pela lateral da tela oferecendo um copo d'água, e some sozinho depois de alguns segundos. Não há texto: o desenho já diz. Cada papel tem o seu gato. Você liga e escolhe o intervalo no próprio post-it. Ele fica quieto das 22h às 8h, e se você não estiver na frente do computador ele guarda a vez e volta daqui a pouco, em vez de perder o horário. E mia baixinho ao aparecer — dá para trocar pelo miado do seu gato, veja [assets/sounds](assets/sounds/LEIA-ME.md).
 - **Agenda.** Toda tarefa tem data; o horário é opcional — "qualquer horário" ou uma hora marcada.
 - **Notificação do Windows.** Tarefa com horário definido dispara um toast na hora marcada.
 - **Quadro "Ver todos".** Mostra os agendamentos futuros como post-its espalhados, que podem ser arrastados e ficam onde você soltar.
@@ -175,6 +175,11 @@ MIT — veja [LICENSE](LICENSE). Use, modifique e distribua à vontade.
 
 As artes dos gatos foram geradas por IA e acompanham o projeto sob a mesma
 licença.
+
+O miado (`assets/sounds/miau.mp3`) é do [Pixabay](https://pixabay.com/sound-effects/),
+por *sound_garage*, sob a [Pixabay Content License](https://pixabay.com/service/license-summary/),
+que permite redistribuir junto com o programa sem exigir crédito — este aqui é
+por cortesia.
 
 ---
 

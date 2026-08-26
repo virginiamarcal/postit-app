@@ -21,7 +21,10 @@ assets/skins-src/_pendente/
 # saida do empacotador
 dist/
 
-# som pessoal: cada um coloca o seu (ver assets/sounds/LEIA-ME.md)
+# Som pessoal fica de fora, para ninguém acabar distribuindo áudio de terceiros
+# sem perceber. A exceção é o miau.mp3 que vem junto com o programa: é do
+# Pixabay, cuja licença permite redistribuir. Ver assets/sounds/LEIA-ME.md.
 assets/sounds/*.mp3
 assets/sounds/*.wav
 assets/sounds/*.ogg
+!assets/sounds/miau.mp3

@@ -1,6 +1,6 @@
 {
   "name": "postit-app",
-  "version": "1.2.0",
+  "version": "1.3.0",
   "private": true,
   "description": "Post-it de bandeja para lembretes e agenda",
   "author": "Virginia Lara Marçal",
@@ -28,6 +28,7 @@
       "renderer/**/*",
       "assets/skins/**/*",
       "assets/sounds/LEIA-ME.md",
+      "assets/sounds/miau.mp3",
       "LICENSE"
     ],
     "win": {
